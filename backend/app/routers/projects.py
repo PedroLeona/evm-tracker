@@ -2,7 +2,8 @@
 
 from fastapi import APIRouter, Depends, Response, status
 
-from app.dependencies import get_project_service
+from app.dependencies import get_project_service, get_tolerance_policy
+from app.domain.tolerance import TolerancePolicy
 from app.mappers import to_report_response
 from app.routers.responses import NOT_FOUND_RESPONSE
 from app.schemas import ProjectEvmReportResponse, ProjectPayload, ProjectResponse
@@ -81,6 +82,8 @@ def delete_project(
     ),
 )
 def get_project_evm_report(
-    project_id: int, service: ProjectService = Depends(get_project_service)
+    project_id: int,
+    service: ProjectService = Depends(get_project_service),
+    policy: TolerancePolicy = Depends(get_tolerance_policy),
 ) -> ProjectEvmReportResponse:
-    return to_report_response(service.build_report(project_id))
+    return to_report_response(service.build_report(project_id, policy), policy)

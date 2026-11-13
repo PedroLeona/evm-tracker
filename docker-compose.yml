@@ -20,6 +20,8 @@ services:
     build: ./backend
     environment:
       DATABASE_URL: postgresql+psycopg://evm:evm@db:5432/evm
+      # Optional: override the tolerance tiers (see README). Defaults apply when omitted.
+      # TOLERANCE_TIERS: '[{"min_budget": 0, "tolerance_percent": 5}]'
     depends_on:
       db:
         condition: service_healthy
