@@ -5,6 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import settings
 from app.constants import API_DOCS_URL, API_PREFIX, API_REDOC_URL
+from app.dependencies import get_tolerance_policy
 from app.errors import register_error_handlers
 from app.routers import activities, projects
 
@@ -17,6 +18,7 @@ API_DESCRIPTION = (
 
 
 def create_app() -> FastAPI:
+    get_tolerance_policy()  # fail fast at startup if the configured tiers are invalid
     app = FastAPI(
         title=API_TITLE,
         version=API_VERSION,

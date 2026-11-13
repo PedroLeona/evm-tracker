@@ -105,6 +105,12 @@ class EvmMetricsResponse(BaseModel):
     )
     cost_status: CostStatus
     schedule_status: ScheduleStatus
+    tolerance_percent: JsonNumber = Field(
+        description=(
+            "Allowed deviation of CPI and SPI from 1 (in %) for this budget size. "
+            "Indices within the range count as on plan."
+        )
+    )
     cost_interpretation: str
     schedule_interpretation: str
 

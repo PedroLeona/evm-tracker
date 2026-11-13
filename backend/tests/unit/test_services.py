@@ -2,6 +2,7 @@ from decimal import Decimal
 
 import pytest
 
+from app.domain.tolerance import DEFAULT_TOLERANCE_POLICY
 from app.errors import ResourceNotFoundError
 from app.repositories import ActivityRepository, ProjectRepository
 from app.schemas import ActivityPayload, ProjectPayload
@@ -44,7 +45,7 @@ class TestProjectService:
     def test_report_for_project_without_activities_has_undefined_indices(self, project_service):
         project = project_service.create_project(ProjectPayload(name="Empty"))
 
-        report = project_service.build_report(project.id)
+        report = project_service.build_report(project.id, DEFAULT_TOLERANCE_POLICY)
 
         assert report.activities == []
         assert report.consolidated.cost_performance_index is None

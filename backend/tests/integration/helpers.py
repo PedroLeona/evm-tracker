@@ -15,6 +15,7 @@ METRIC_KEYS = {
     "variance_at_completion",
     "cost_status",
     "schedule_status",
+    "tolerance_percent",
     "cost_interpretation",
     "schedule_interpretation",
 }

@@ -24,7 +24,7 @@ filterwarnings = [
 
 [tool.coverage.run]
 source = ["app"]
-omit = ["app/database.py", "app/config.py"]
+omit = ["app/database.py"]
 
 [tool.coverage.report]
 fail_under = 80
