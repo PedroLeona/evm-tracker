@@ -115,3 +115,14 @@ La lógica de negocio no vive en los controladores. `domain/` no conoce FastAPI 
 - [`AI_PROCESS.md`](AI_PROCESS.md): proceso de trabajo con IA.
 - [`docs/EVM_STUDY_GUIDE.md`](docs/EVM_STUDY_GUIDE.md): guía de estudio del Valor Ganado.
 - [`docs/GITFLOW_PLAN.md`](docs/GITFLOW_PLAN.md): ramas, PRs y mensajes de commit.
+
+## Architecture
+
+The application follows a layered architecture:
+
+- **Frontend:** React application responsible for the user interface.
+- **API:** FastAPI endpoints that handle HTTP requests.
+- **Services:** Coordinate business operations.
+- **Repositories:** Manage database persistence.
+- **Domain:** Contains the Earned Value Management calculations.
+- **Database:** PostgreSQL stores projects and activities.
