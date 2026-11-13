@@ -1,0 +1,31 @@
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+# E/F: pycodestyle + pyflakes (unused variables/imports), I: import order,
+# N: naming, B: bugbear, C90: complexity, UP/SIM: modernise/simplify,
+# ERA: commented-out code, PLR2004: magic values in comparisons.
+select = ["E", "F", "I", "N", "B", "C90", "UP", "SIM", "ERA", "PLR2004"]
+
+[tool.ruff.lint.mccabe]
+max-complexity = 6
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["PLR2004"]
+"app/routers/*" = ["B008"]
+"app/dependencies.py" = ["B008"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+filterwarnings = [
+    "ignore:Dialect sqlite\\+pysqlite does \\*not\\* support Decimal objects natively:sqlalchemy.exc.SAWarning",
+]
+
+[tool.coverage.run]
+source = ["app"]
+omit = ["app/database.py", "app/config.py"]
+
+[tool.coverage.report]
+fail_under = 80
+show_missing = true
