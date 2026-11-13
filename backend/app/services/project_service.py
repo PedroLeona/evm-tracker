@@ -1,6 +1,7 @@
 """Project use cases."""
 
 from app.constants import RESOURCE_PROJECT
+from app.domain.tolerance import TolerancePolicy
 from app.errors import ResourceNotFoundError
 from app.models import Project
 from app.repositories import ProjectRepository
@@ -33,5 +34,5 @@ class ProjectService:
     def delete_project(self, project_id: int) -> None:
         self._projects.delete(self.get_project(project_id))
 
-    def build_report(self, project_id: int) -> ProjectReport:
-        return build_project_report(self.get_project(project_id))
+    def build_report(self, project_id: int, policy: TolerancePolicy) -> ProjectReport:
+        return build_project_report(self.get_project(project_id), policy)

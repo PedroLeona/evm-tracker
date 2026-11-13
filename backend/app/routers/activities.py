@@ -2,7 +2,8 @@
 
 from fastapi import APIRouter, Depends, Response, status
 
-from app.dependencies import get_activity_service
+from app.dependencies import get_activity_service, get_tolerance_policy
+from app.domain.tolerance import TolerancePolicy
 from app.mappers import to_activity_response
 from app.routers.responses import NOT_FOUND_RESPONSE
 from app.schemas import ActivityPayload, ActivityResponse
@@ -18,10 +19,13 @@ router = APIRouter(tags=["Activities"])
     summary="List a project's activities with their EVM metrics",
 )
 def list_activities(
-    project_id: int, service: ActivityService = Depends(get_activity_service)
+    project_id: int,
+    service: ActivityService = Depends(get_activity_service),
+    policy: TolerancePolicy = Depends(get_tolerance_policy),
 ) -> list[ActivityResponse]:
     return [
-        to_activity_response(activity) for activity in service.list_for_project(project_id)
+        to_activity_response(activity, policy)
+        for activity in service.list_for_project(project_id)
     ]
 
 
@@ -36,8 +40,9 @@ def create_activity(
     project_id: int,
     payload: ActivityPayload,
     service: ActivityService = Depends(get_activity_service),
+    policy: TolerancePolicy = Depends(get_tolerance_policy),
 ) -> ActivityResponse:
-    return to_activity_response(service.create_activity(project_id, payload))
+    return to_activity_response(service.create_activity(project_id, payload), policy)
 
 
 @router.get(
@@ -47,9 +52,11 @@ def create_activity(
     summary="Get an activity with its EVM metrics",
 )
 def get_activity(
-    activity_id: int, service: ActivityService = Depends(get_activity_service)
+    activity_id: int,
+    service: ActivityService = Depends(get_activity_service),
+    policy: TolerancePolicy = Depends(get_tolerance_policy),
 ) -> ActivityResponse:
-    return to_activity_response(service.get_activity(activity_id))
+    return to_activity_response(service.get_activity(activity_id), policy)
 
 
 @router.put(
@@ -62,8 +69,9 @@ def update_activity(
     activity_id: int,
     payload: ActivityPayload,
     service: ActivityService = Depends(get_activity_service),
+    policy: TolerancePolicy = Depends(get_tolerance_policy),
 ) -> ActivityResponse:
-    return to_activity_response(service.update_activity(activity_id, payload))
+    return to_activity_response(service.update_activity(activity_id, payload), policy)
 
 
 @router.delete(

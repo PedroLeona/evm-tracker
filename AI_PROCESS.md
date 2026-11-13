@@ -54,7 +54,7 @@ Puntos del código generado que podrías cuestionar (solo úsalos si de verdad e
 - Porcentajes en escala 0–100 vs. 0–1.
 - Redondeo (4 decimales en índices, 2 en dinero).
 - `PUT` con reemplazo completo vs. `PATCH` parcial.
-- Estado "en presupuesto/cronograma" solo cuando el índice es exactamente 1 (sin tolerancia).
+- ~~Estado "en presupuesto/cronograma" solo cuando el índice es exactamente 1 (sin tolerancia).~~ **Ya cambiado:** la IA propuso comparar contra 1 sin tolerancia; la idea de una tolerancia que dependa del BAC, y de que los niveles sean configurables por el negocio, fue tuya. Cuéntalo con tus palabras en la Decisión 1 (qué propuso la IA, qué propusiste tú y por qué, y cómo lo verificaste: ver `tests/unit/test_tolerance.py`). Nota honesta: los montos y porcentajes por defecto (5 % / 3 % / 1 %, cortes en 50 M y 500 M) son valores de ejemplo que propuso la IA y tú aceptaste "por el momento".
 
 ## 5. Cómo verifiqué que los cálculos son correctos
 

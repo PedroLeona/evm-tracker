@@ -9,6 +9,7 @@ from app.domain.evm import (
     calculate_activity_metrics,
     calculate_project_metrics,
 )
+from app.domain.tolerance import TolerancePolicy
 from app.models import Activity, Project
 
 
@@ -28,13 +29,13 @@ def to_evm_inputs(activity: Activity) -> EvmInputs:
     )
 
 
-def calculate_for_activity(activity: Activity) -> EvmMetrics:
-    return calculate_activity_metrics(to_evm_inputs(activity))
+def calculate_for_activity(activity: Activity, policy: TolerancePolicy) -> EvmMetrics:
+    return calculate_activity_metrics(to_evm_inputs(activity), policy)
 
 
-def build_project_report(project: Project) -> ProjectReport:
+def build_project_report(project: Project, policy: TolerancePolicy) -> ProjectReport:
     consolidated = calculate_project_metrics(
-        to_evm_inputs(activity) for activity in project.activities
+        (to_evm_inputs(activity) for activity in project.activities), policy
     )
     return ProjectReport(
         project=project, consolidated=consolidated, activities=project.activities

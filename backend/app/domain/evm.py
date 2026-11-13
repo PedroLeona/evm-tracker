@@ -25,6 +25,7 @@ from app.domain.status import (
     classify_cost,
     classify_schedule,
 )
+from app.domain.tolerance import DEFAULT_TOLERANCE_POLICY, TolerancePolicy
 
 
 @dataclass(frozen=True)
@@ -49,6 +50,11 @@ class EvmMetrics:
     variance_at_completion: Decimal | None
     cost_status: CostStatus
     schedule_status: ScheduleStatus
+    tolerance: Decimal
+
+    @property
+    def tolerance_percent(self) -> Decimal:
+        return self.tolerance * PERCENT_BASE
 
     @property
     def cost_interpretation(self) -> str:
@@ -80,13 +86,17 @@ class _Totals:
         )
 
 
-def calculate_activity_metrics(inputs: EvmInputs) -> EvmMetrics:
-    return _build_metrics(_to_totals(inputs))
+def calculate_activity_metrics(
+    inputs: EvmInputs, policy: TolerancePolicy = DEFAULT_TOLERANCE_POLICY
+) -> EvmMetrics:
+    return _build_metrics(_to_totals(inputs), policy)
 
 
-def calculate_project_metrics(activities: Iterable[EvmInputs]) -> EvmMetrics:
+def calculate_project_metrics(
+    activities: Iterable[EvmInputs], policy: TolerancePolicy = DEFAULT_TOLERANCE_POLICY
+) -> EvmMetrics:
     totals = sum((_to_totals(item) for item in activities), start=_Totals.zero())
-    return _build_metrics(totals)
+    return _build_metrics(totals, policy)
 
 
 def _to_totals(inputs: EvmInputs) -> _Totals:
@@ -102,7 +112,8 @@ def _percent_of(percent: Decimal, amount: Decimal) -> Decimal:
     return percent / PERCENT_BASE * amount
 
 
-def _build_metrics(totals: _Totals) -> EvmMetrics:
+def _build_metrics(totals: _Totals, policy: TolerancePolicy) -> EvmMetrics:
+    tolerance = policy.tolerance_for(totals.budget_at_completion)
     cost_index = _safe_divide(totals.earned_value, totals.actual_cost)
     schedule_index = _safe_divide(totals.earned_value, totals.planned_value)
     estimate_at_completion = _safe_divide(totals.budget_at_completion, cost_index)
@@ -121,8 +132,9 @@ def _build_metrics(totals: _Totals) -> EvmMetrics:
         schedule_performance_index=_round_index(schedule_index),
         estimate_at_completion=_round_optional_money(estimate_at_completion),
         variance_at_completion=_round_optional_money(variance_at_completion),
-        cost_status=classify_cost(cost_index),
-        schedule_status=classify_schedule(schedule_index),
+        cost_status=classify_cost(cost_index, tolerance),
+        schedule_status=classify_schedule(schedule_index, tolerance),
+        tolerance=tolerance,
     )
 
 

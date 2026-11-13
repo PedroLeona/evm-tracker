@@ -80,6 +80,29 @@ Los tests usan SQLite en memoria, por lo que no necesitan PostgreSQL.
 - **Índice indefinido → `null`:** si AC = 0 el CPI es `null`; si PV = 0 el SPI es `null`; si CPI es `null` o 0, EAC y VAC son `null`. Se devuelve `null` (y estado `UNDEFINED`) para no confundir "sin datos" con "va mal" ni con "va perfecto".
 - **Dinero con `Decimal`:** sin errores de punto flotante. Los valores se redondean (half-up) solo al construir la respuesta: dinero a 2 decimales, índices a 4.
 - **Proyecto sin actividades:** totales en 0 e índices `null`.
+- **Tolerancia según el presupuesto:** un índice dentro de `1 ± tolerancia` (límites incluidos) se considera "en plan". La tolerancia depende del BAC, porque el mismo porcentaje pesa mucho más en dinero en un presupuesto grande. Ver la sección siguiente.
+
+## Tolerancia configurable
+
+Niveles por defecto (el monto usa la misma moneda del BAC):
+
+| BAC desde | Tolerancia | Ejemplo: CPI/SPI "en plan" |
+|---|---|---|
+| 0 | ±5 % | entre 0,95 y 1,05 |
+| 50.000.000 | ±3 % | entre 0,97 y 1,03 |
+| 500.000.000 | ±1 % | entre 0,99 y 1,01 |
+
+- En una actividad se usa su propio BAC; en el consolidado, el BAC total del proyecto.
+- La misma tolerancia aplica al costo (CPI) y al cronograma (SPI).
+- La API informa la tolerancia usada en `tolerance_percent`, y el dashboard la muestra.
+
+**Cambiar los niveles sin tocar el código:** define la variable de entorno `TOLERANCE_TIERS` con una lista JSON (`min_budget` y `tolerance_percent`) y reinicia el backend:
+
+```bash
+TOLERANCE_TIERS='[{"min_budget": 0, "tolerance_percent": 5}, {"min_budget": 20000000, "tolerance_percent": 2}]'
+```
+
+En Docker, agrégala en `docker-compose.yml`, bajo `backend.environment` (entre comillas simples). Reglas: el primer nivel debe empezar en 0, los montos deben ir en orden ascendente y cada tolerancia debe estar entre 0 % y menos de 100 %. Si la configuración es inválida, el backend no arranca y explica el motivo. Si se omite la variable, se usan los niveles por defecto.
 
 ## API
 
@@ -115,14 +138,3 @@ La lógica de negocio no vive en los controladores. `domain/` no conoce FastAPI 
 - [`AI_PROCESS.md`](AI_PROCESS.md): proceso de trabajo con IA.
 - [`docs/EVM_STUDY_GUIDE.md`](docs/EVM_STUDY_GUIDE.md): guía de estudio del Valor Ganado.
 - [`docs/GITFLOW_PLAN.md`](docs/GITFLOW_PLAN.md): ramas, PRs y mensajes de commit.
-
-## Architecture
-
-The application follows a layered architecture:
-
-- **Frontend:** React application responsible for the user interface.
-- **API:** FastAPI endpoints that handle HTTP requests.
-- **Services:** Coordinate business operations.
-- **Repositories:** Manage database persistence.
-- **Domain:** Contains the Earned Value Management calculations.
-- **Database:** PostgreSQL stores projects and activities.

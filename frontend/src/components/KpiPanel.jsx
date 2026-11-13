@@ -29,6 +29,10 @@ export default function KpiPanel({ consolidated }) {
     <section className="panel">
       <div className={`headline headline--${tone}`}>
         <h2>{overallHeadline(tone)}</h2>
+        <p className="muted">
+          Tolerancia aplicada: ±{consolidated.tolerance_percent}% (un índice dentro de ese rango
+          se considera &quot;en plan&quot;)
+        </p>
         <div className="headline__statuses">
           <div>
             <strong>Costo (CPI {formatIndex(consolidated.cost_performance_index)})</strong>
